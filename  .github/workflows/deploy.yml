@@ -1,0 +1,23 @@
+name: Deploy Locally with Docker Compose
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy via SSH with password
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        script: |
+          cd /var/www/
+          git pull origin main
+          docker-compose -f deploy/docker-compose.yml down
+          docker-compose -f deploy/docker-compose.yml up -d --build
