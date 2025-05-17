@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo with submodules
+    - name: Checkout repository with submodules
       uses: actions/checkout@v4
       with:
         submodules: recursive
@@ -22,28 +22,40 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASSWORD }}
         script: |
-            #!/bin/bash
+          #!/bin/bash
 
-            PROJECT_DIR="/var/www/"
+          PROJECT_DIR="/var/www"
 
-            mkdir -p "$PROJECT_DIR"
-            cd "$PROJECT_DIR" || exit 1
+          mkdir -p "$PROJECT_DIR"
+          cd "$PROJECT_DIR" || exit 1
 
-            if [ ! -d ".git" ]; then
-              git clone <repository-url> .
-            else
-              git pull origin main
-              git submodule update --init --recursive
-            fi
+          rm -rf "$PROJECT_DIR"/*
 
-            if command -v docker &> /dev/null && docker compose version &> /dev/null; then
-              COMPOSE_CMD="docker compose"
-            elif command -v docker-compose &> /dev/null; then
-              COMPOSE_CMD="docker-compose"
-            else
-              echo "Error: neither 'docker compose' nor 'docker-compose' is installed."
-              exit 1
-            fi
+    - name: Sync code to server
+      uses: appleboy/scp-action@v0.1.8
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        source: "."
+        target: "/var/www"
 
-            $COMPOSE_CMD -f deploy/docker-compose.yml down
-            $COMPOSE_CMD -f deploy/docker-compose.yml up -d --build
+    - name: Run docker-compose on server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        script: |
+          cd /var/www
+          if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+            COMPOSE_CMD="docker compose"
+          elif command -v docker-compose &> /dev/null; then
+            COMPOSE_CMD="docker-compose"
+          else
+            echo "error not install docker"
+            exit 1
+          fi
+
+          $COMPOSE_CMD -f deploy/docker-compose.yml down
+          $COMPOSE_CMD -f deploy/docker-compose.yml up -d --build
