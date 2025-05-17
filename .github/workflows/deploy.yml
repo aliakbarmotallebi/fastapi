@@ -23,6 +23,7 @@ jobs:
           password: ${{ secrets.REMOTE_PASSWORD }}
           script: |
             cd /var/www/
+            git submodule update --init --recursive
             git pull origin main
             docker-compose -f deploy/docker-compose.yml down
             docker-compose -f deploy/docker-compose.yml up -d --build
