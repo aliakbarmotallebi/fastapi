@@ -16,7 +16,7 @@ jobs:
         submodules: recursive
 
     - name: Deploy via SSH
-      uses: appleboy/ssh-action@v1.0.0
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
@@ -32,7 +32,7 @@ jobs:
           rm -rf "$PROJECT_DIR"/*
 
     - name: Sync code to server
-      uses: appleboy/scp-action@v0.1.8
+      uses: appleboy/scp-action@master
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
@@ -41,7 +41,7 @@ jobs:
         target: "/var/www"
 
     - name: Run docker-compose on server
-      uses: appleboy/ssh-action@v1.0.0
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
