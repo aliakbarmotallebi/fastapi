@@ -3,28 +3,28 @@ name: Deploy with Submodule
 on:
   push:
     branches:
-      - main
+    - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo with submodules
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+    - name: Checkout repo with submodules
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          password: ${{ secrets.REMOTE_PASSWORD }}
-          script: |
-            cd /var/www/
-            git submodule update --init --recursive
-            git pull origin main
-            docker-compose -f deploy/docker-compose.yml down
-            docker-compose -f deploy/docker-compose.yml up -d --build
-
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASSWORD }}
+        script: |
+          echo "Host is: ${{ secrets.REMOTE_HOST }}"
+          cd /var/www/
+          git submodule update --init --recursive
+          git pull origin main
+          docker-compose -f deploy/docker-compose.yml down
+          docker-compose -f deploy/docker-compose.yml up -d --build
