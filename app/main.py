@@ -4,4 +4,4 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello from Fastapi me checked deploy success git runner"}
+    return {"message": "hi from Fastapi me checked deploy success git runner :/"}
