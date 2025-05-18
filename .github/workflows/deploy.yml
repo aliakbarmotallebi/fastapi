@@ -57,5 +57,5 @@ jobs:
             exit 1
           fi
 
-          $COMPOSE_CMD -f docker-compose.yml down
+          $COMPOSE_CMD -f docker-compose.yml down --remove-orphans || true
           $COMPOSE_CMD -f docker-compose.yml up -d --build
